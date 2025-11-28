@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { Sparkles } from "lucide-react";
 
 const Index = () => {
   return (
@@ -19,8 +18,7 @@ const Index = () => {
           <h1 className="font-heading text-5xl font-bold text-primary-foreground tracking-tight">
             Kalam
           </h1>
-          <p className="text-primary-foreground/80 mt-3 text-base flex items-center justify-center gap-2">
-            <Sparkles className="w-4 h-4" />
+          <p className="text-primary-foreground/80 mt-3 text-base">
             Learn languages the smart way
           </p>
         </header>
@@ -38,7 +36,7 @@ const Index = () => {
         <Button 
           variant="outline" 
           size="lg" 
-          className="w-full border-primary-foreground/30 text-primary-foreground bg-transparent hover:bg-primary-foreground/10"
+          className="w-full border-primary-foreground/40 text-primary-foreground bg-white/10 hover:bg-white/20 backdrop-blur-sm"
         >
           Sign in
         </Button>

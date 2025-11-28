@@ -29,14 +29,14 @@ const Index = () => {
         <Button 
           variant="soft" 
           size="lg" 
-          className="w-full bg-primary-foreground text-primary hover:bg-primary-foreground/90 shadow-lg shadow-black/10"
+          className="w-full bg-primary-foreground text-primary shadow-lg shadow-black/10 hover:shadow-xl hover:shadow-black/15 hover:-translate-y-0.5 transition-all duration-200"
         >
           Get Started
         </Button>
         <Button 
           variant="outline" 
           size="lg" 
-          className="w-full border-primary-foreground/40 text-primary-foreground bg-white/10 hover:bg-white/20 backdrop-blur-sm"
+          className="w-full border-primary-foreground/40 text-primary-foreground bg-white/10 hover:bg-white/25 hover:border-primary-foreground/60 hover:shadow-lg hover:shadow-white/10 backdrop-blur-sm transition-all duration-200"
         >
           Sign in
         </Button>

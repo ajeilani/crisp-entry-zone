@@ -19,7 +19,7 @@ const Index = () => {
             Kalam
           </h1>
           <p className="text-primary-foreground/80 mt-3 text-base">
-            Learn languages the smart way
+            Learn Arabic with confidence
           </p>
         </header>
       </div>

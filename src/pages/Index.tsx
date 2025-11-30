@@ -2,52 +2,65 @@ import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 
 const Index = () => {
+  const [splashFading, setSplashFading] = useState(false);
   const [showSplash, setShowSplash] = useState(true);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
+    // Start fade out
+    const fadeTimer = setTimeout(() => {
+      setSplashFading(true);
+    }, 1500);
+    
+    // Remove splash after fade completes
+    const hideTimer = setTimeout(() => {
       setShowSplash(false);
-    }, 2000);
-    return () => clearTimeout(timer);
+    }, 2300);
+    
+    return () => {
+      clearTimeout(fadeTimer);
+      clearTimeout(hideTimer);
+    };
   }, []);
-
-  // Splash Screen
-  if (showSplash) {
-    return (
-      <main className="min-h-screen flex items-center justify-center gradient-primary overflow-hidden">
-        {/* Central orb */}
-        <div className="absolute w-32 h-32 bg-white/20 rounded-full blur-xl animate-pulse" />
-        
-        {/* Orbiting circles */}
-        <div className="relative w-64 h-64">
-          {/* Ring 1 - slow */}
-          <div className="absolute inset-0 animate-spin" style={{ animationDuration: '8s' }}>
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-8 bg-white/30 rounded-full blur-sm" />
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-6 bg-white/20 rounded-full blur-sm" />
-          </div>
-          
-          {/* Ring 2 - medium */}
-          <div className="absolute inset-4 animate-spin" style={{ animationDuration: '6s', animationDirection: 'reverse' }}>
-            <div className="absolute top-0 right-0 w-5 h-5 bg-white/40 rounded-full" />
-            <div className="absolute bottom-0 left-0 w-4 h-4 bg-white/25 rounded-full" />
-          </div>
-          
-          {/* Ring 3 - fast */}
-          <div className="absolute inset-8 animate-spin" style={{ animationDuration: '4s' }}>
-            <div className="absolute top-1/2 left-0 -translate-y-1/2 w-3 h-3 bg-white/50 rounded-full" />
-            <div className="absolute top-1/2 right-0 -translate-y-1/2 w-4 h-4 bg-white/35 rounded-full" />
-          </div>
-          
-          {/* Floating shapes */}
-          <div className="absolute top-1/4 left-1/4 w-6 h-6 bg-white/15 rounded-lg rotate-45 animate-bounce" style={{ animationDuration: '2s' }} />
-          <div className="absolute bottom-1/4 right-1/4 w-5 h-5 bg-white/20 rounded-lg rotate-12 animate-bounce" style={{ animationDuration: '2.5s', animationDelay: '0.5s' }} />
-        </div>
-      </main>
-    );
-  }
 
   return (
     <main className="min-h-screen flex flex-col gradient-primary overflow-hidden relative">
+      {/* Splash Screen Overlay */}
+      {showSplash && (
+        <div 
+          className={`absolute inset-0 z-50 flex items-center justify-center gradient-primary transition-opacity duration-700 ${
+            splashFading ? 'opacity-0' : 'opacity-100'
+          }`}
+        >
+          {/* Central orb */}
+          <div className="absolute w-32 h-32 bg-white/20 rounded-full blur-xl animate-pulse" />
+          
+          {/* Orbiting circles */}
+          <div className="relative w-64 h-64">
+            {/* Ring 1 - slow */}
+            <div className="absolute inset-0 animate-spin" style={{ animationDuration: '8s' }}>
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-8 bg-white/30 rounded-full blur-sm" />
+              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-6 bg-white/20 rounded-full blur-sm" />
+            </div>
+            
+            {/* Ring 2 - medium */}
+            <div className="absolute inset-4 animate-spin" style={{ animationDuration: '6s', animationDirection: 'reverse' }}>
+              <div className="absolute top-0 right-0 w-5 h-5 bg-white/40 rounded-full" />
+              <div className="absolute bottom-0 left-0 w-4 h-4 bg-white/25 rounded-full" />
+            </div>
+            
+            {/* Ring 3 - fast */}
+            <div className="absolute inset-8 animate-spin" style={{ animationDuration: '4s' }}>
+              <div className="absolute top-1/2 left-0 -translate-y-1/2 w-3 h-3 bg-white/50 rounded-full" />
+              <div className="absolute top-1/2 right-0 -translate-y-1/2 w-4 h-4 bg-white/35 rounded-full" />
+            </div>
+            
+            {/* Floating shapes */}
+            <div className="absolute top-1/4 left-1/4 w-6 h-6 bg-white/15 rounded-lg rotate-45 animate-bounce" style={{ animationDuration: '2s' }} />
+            <div className="absolute bottom-1/4 right-1/4 w-5 h-5 bg-white/20 rounded-lg rotate-12 animate-bounce" style={{ animationDuration: '2.5s', animationDelay: '0.5s' }} />
+          </div>
+        </div>
+      )}
+
       {/* Floating background shapes */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-32 h-32 bg-white/10 rounded-full blur-2xl animate-pulse" />
@@ -57,9 +70,13 @@ const Index = () => {
       </div>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6 relative z-10">
+      <div 
+        className={`flex-1 flex flex-col items-center justify-center px-6 relative z-10 transition-opacity duration-500 ${
+          showSplash ? 'opacity-0' : 'opacity-100'
+        }`}
+      >
         {/* Logo */}
-        <header className="text-center animate-scale-in">
+        <header className="text-center">
           <h1 className="font-heading text-5xl font-bold text-primary-foreground tracking-tight">
             Kalam
           </h1>
@@ -70,7 +87,12 @@ const Index = () => {
       </div>
 
       {/* Bottom buttons */}
-      <footer className="px-6 pb-10 pt-4 space-y-3 relative z-10 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+      <footer 
+        className={`px-6 pb-10 pt-4 space-y-3 relative z-10 transition-opacity duration-500 ${
+          showSplash ? 'opacity-0' : 'opacity-100'
+        }`}
+        style={{ transitionDelay: '0.1s' }}
+      >
         <Button 
           variant="soft" 
           size="lg" 

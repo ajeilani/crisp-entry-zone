@@ -14,24 +14,51 @@ const Index = () => {
   // Splash Screen
   if (showSplash) {
     return (
-      <main className="min-h-screen flex flex-col items-center justify-center gradient-primary overflow-hidden relative">
-        {/* Animated background circles */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-white/10 rounded-full blur-3xl animate-pulse" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-white/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '0.5s' }} />
-        </div>
-        
-        {/* Logo */}
-        <div className="relative z-10 text-center animate-scale-in">
-          <h1 className="font-heading text-7xl font-bold text-primary-foreground tracking-tight">
+      <main className="min-h-screen flex flex-col gradient-primary overflow-hidden relative">
+        {/* Logo at top */}
+        <div className="pt-20 text-center animate-scale-in relative z-10">
+          <h1 className="font-heading text-6xl font-bold text-primary-foreground tracking-tight">
             Kalam
           </h1>
-          <div className="mt-8 flex justify-center">
-            <div className="flex gap-1">
-              <span className="w-2 h-2 bg-primary-foreground/80 rounded-full animate-bounce" style={{ animationDelay: '0s' }} />
-              <span className="w-2 h-2 bg-primary-foreground/80 rounded-full animate-bounce" style={{ animationDelay: '0.15s' }} />
-              <span className="w-2 h-2 bg-primary-foreground/80 rounded-full animate-bounce" style={{ animationDelay: '0.3s' }} />
+        </div>
+        
+        {/* Animated shapes in center */}
+        <div className="flex-1 flex items-center justify-center relative">
+          {/* Central orb */}
+          <div className="absolute w-32 h-32 bg-white/20 rounded-full blur-xl animate-pulse" />
+          
+          {/* Orbiting circles */}
+          <div className="relative w-64 h-64">
+            {/* Ring 1 - slow */}
+            <div className="absolute inset-0 animate-spin" style={{ animationDuration: '8s' }}>
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-8 bg-white/30 rounded-full blur-sm" />
+              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-6 bg-white/20 rounded-full blur-sm" />
             </div>
+            
+            {/* Ring 2 - medium */}
+            <div className="absolute inset-4 animate-spin" style={{ animationDuration: '6s', animationDirection: 'reverse' }}>
+              <div className="absolute top-0 right-0 w-5 h-5 bg-white/40 rounded-full" />
+              <div className="absolute bottom-0 left-0 w-4 h-4 bg-white/25 rounded-full" />
+            </div>
+            
+            {/* Ring 3 - fast */}
+            <div className="absolute inset-8 animate-spin" style={{ animationDuration: '4s' }}>
+              <div className="absolute top-1/2 left-0 -translate-y-1/2 w-3 h-3 bg-white/50 rounded-full" />
+              <div className="absolute top-1/2 right-0 -translate-y-1/2 w-4 h-4 bg-white/35 rounded-full" />
+            </div>
+            
+            {/* Floating shapes */}
+            <div className="absolute top-1/4 left-1/4 w-6 h-6 bg-white/15 rounded-lg rotate-45 animate-bounce" style={{ animationDuration: '2s' }} />
+            <div className="absolute bottom-1/4 right-1/4 w-5 h-5 bg-white/20 rounded-lg rotate-12 animate-bounce" style={{ animationDuration: '2.5s', animationDelay: '0.5s' }} />
+          </div>
+        </div>
+        
+        {/* Loading dots at bottom */}
+        <div className="pb-20 flex justify-center">
+          <div className="flex gap-1.5">
+            <span className="w-2 h-2 bg-primary-foreground/70 rounded-full animate-bounce" style={{ animationDelay: '0s' }} />
+            <span className="w-2 h-2 bg-primary-foreground/70 rounded-full animate-bounce" style={{ animationDelay: '0.15s' }} />
+            <span className="w-2 h-2 bg-primary-foreground/70 rounded-full animate-bounce" style={{ animationDelay: '0.3s' }} />
           </div>
         </div>
       </main>

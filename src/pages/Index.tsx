@@ -1,6 +1,43 @@
 import { Button } from "@/components/ui/button";
+import { useState, useEffect } from "react";
 
 const Index = () => {
+  const [showSplash, setShowSplash] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowSplash(false);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Splash Screen
+  if (showSplash) {
+    return (
+      <main className="min-h-screen flex flex-col items-center justify-center gradient-primary overflow-hidden relative">
+        {/* Animated background circles */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-white/10 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-white/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '0.5s' }} />
+        </div>
+        
+        {/* Logo */}
+        <div className="relative z-10 text-center animate-scale-in">
+          <h1 className="font-heading text-7xl font-bold text-primary-foreground tracking-tight">
+            Kalam
+          </h1>
+          <div className="mt-8 flex justify-center">
+            <div className="flex gap-1">
+              <span className="w-2 h-2 bg-primary-foreground/80 rounded-full animate-bounce" style={{ animationDelay: '0s' }} />
+              <span className="w-2 h-2 bg-primary-foreground/80 rounded-full animate-bounce" style={{ animationDelay: '0.15s' }} />
+              <span className="w-2 h-2 bg-primary-foreground/80 rounded-full animate-bounce" style={{ animationDelay: '0.3s' }} />
+            </div>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="min-h-screen flex flex-col gradient-primary overflow-hidden relative">
       {/* Floating background shapes */}

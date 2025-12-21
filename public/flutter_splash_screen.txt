@@ -1,0 +1,250 @@
+// Flutter Splash Screen Animation
+// Copy this entire file into your Flutter project
+
+import 'package:flutter/material.dart';
+import 'dart:math' as math;
+
+class SplashScreen extends StatefulWidget {
+  final VoidCallback? onComplete;
+  
+  const SplashScreen({super.key, this.onComplete});
+
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen>
+    with TickerProviderStateMixin {
+  late AnimationController _ring1Controller;
+  late AnimationController _ring2Controller;
+  late AnimationController _ring3Controller;
+  late AnimationController _pulseController;
+  late AnimationController _bounceController;
+  late AnimationController _fadeController;
+
+  @override
+  void initState() {
+    super.initState();
+    
+    // Rotating rings
+    _ring1Controller = AnimationController(
+      duration: const Duration(seconds: 8),
+      vsync: this,
+    )..repeat();
+    
+    _ring2Controller = AnimationController(
+      duration: const Duration(seconds: 6),
+      vsync: this,
+    )..repeat(reverse: false);
+    
+    _ring3Controller = AnimationController(
+      duration: const Duration(seconds: 4),
+      vsync: this,
+    )..repeat();
+    
+    // Pulsing orb
+    _pulseController = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    )..repeat(reverse: true);
+    
+    // Bouncing squares
+    _bounceController = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    )..repeat(reverse: true);
+    
+    // Fade out after 1.5s
+    _fadeController = AnimationController(
+      duration: const Duration(milliseconds: 700),
+      vsync: this,
+    );
+    
+    Future.delayed(const Duration(milliseconds: 1500), () {
+      _fadeController.forward().then((_) {
+        widget.onComplete?.call();
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _ring1Controller.dispose();
+    _ring2Controller.dispose();
+    _ring3Controller.dispose();
+    _pulseController.dispose();
+    _bounceController.dispose();
+    _fadeController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: Tween<double>(begin: 1, end: 0).animate(_fadeController),
+      child: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
+          ),
+        ),
+        child: Center(
+          child: SizedBox(
+            width: 256,
+            height: 256,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                // Central pulsing orb
+                AnimatedBuilder(
+                  animation: _pulseController,
+                  builder: (context, child) {
+                    return Container(
+                      width: 128 + (_pulseController.value * 20),
+                      height: 128 + (_pulseController.value * 20),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white.withOpacity(0.2),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.white.withOpacity(0.3),
+                            blurRadius: 40,
+                            spreadRadius: 10,
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+                
+                // Ring 1 - slow (8s)
+                _buildRing(_ring1Controller, 128, [
+                  _Orb(angle: 0, size: 32, opacity: 0.3),
+                  _Orb(angle: math.pi, size: 24, opacity: 0.2),
+                ]),
+                
+                // Ring 2 - medium reverse (6s)
+                _buildRing(_ring2Controller, 96, [
+                  _Orb(angle: math.pi / 4, size: 20, opacity: 0.4),
+                  _Orb(angle: math.pi + math.pi / 4, size: 16, opacity: 0.25),
+                ], reverse: true),
+                
+                // Ring 3 - fast (4s)
+                _buildRing(_ring3Controller, 64, [
+                  _Orb(angle: math.pi / 2, size: 12, opacity: 0.5),
+                  _Orb(angle: -math.pi / 2, size: 16, opacity: 0.35),
+                ]),
+                
+                // Floating bouncing squares
+                AnimatedBuilder(
+                  animation: _bounceController,
+                  builder: (context, child) {
+                    return Stack(
+                      children: [
+                        Positioned(
+                          top: 64 - (_bounceController.value * 20),
+                          left: 64,
+                          child: Transform.rotate(
+                            angle: math.pi / 4,
+                            child: Container(
+                              width: 24,
+                              height: 24,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.15),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          bottom: 64 - (_bounceController.value * 15),
+                          right: 64,
+                          child: Transform.rotate(
+                            angle: math.pi / 12,
+                            child: Container(
+                              width: 20,
+                              height: 20,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRing(AnimationController controller, double radius, List<_Orb> orbs, {bool reverse = false}) {
+    return AnimatedBuilder(
+      animation: controller,
+      builder: (context, child) {
+        final angle = controller.value * 2 * math.pi * (reverse ? -1 : 1);
+        return Stack(
+          alignment: Alignment.center,
+          children: orbs.map((orb) {
+            final x = math.cos(angle + orb.angle) * radius;
+            final y = math.sin(angle + orb.angle) * radius;
+            return Transform.translate(
+              offset: Offset(x, y),
+              child: Container(
+                width: orb.size,
+                height: orb.size,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withOpacity(orb.opacity),
+                ),
+              ),
+            );
+          }).toList(),
+        );
+      },
+    );
+  }
+}
+
+class _Orb {
+  final double angle;
+  final double size;
+  final double opacity;
+  
+  _Orb({required this.angle, required this.size, required this.opacity});
+}
+
+
+// ============================================
+// USAGE EXAMPLE
+// ============================================
+
+// In your main.dart or initial route:
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: SplashScreen(
+        onComplete: () {
+          // Navigate to your home screen after splash
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => HomeScreen()),
+          );
+        },
+      ),
+    );
+  }
+}
+
+// Or use it as an overlay in your existing app structure

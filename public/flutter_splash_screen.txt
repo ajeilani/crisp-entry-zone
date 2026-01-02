@@ -1,4 +1,5 @@
 // Flutter Splash Screen Animation
+// Matches the Kalam web splash exactly
 // Copy this entire file into your Flutter project
 
 import 'package:flutter/material.dart';
@@ -19,51 +20,65 @@ class _SplashScreenState extends State<SplashScreen>
   late AnimationController _ring2Controller;
   late AnimationController _ring3Controller;
   late AnimationController _pulseController;
-  late AnimationController _bounceController;
+  late AnimationController _bounce1Controller;
+  late AnimationController _bounce2Controller;
   late AnimationController _fadeController;
 
   @override
   void initState() {
     super.initState();
     
-    // Rotating rings
+    // Ring 1 - slow spin (8s)
     _ring1Controller = AnimationController(
       duration: const Duration(seconds: 8),
       vsync: this,
     )..repeat();
     
+    // Ring 2 - medium reverse spin (6s)
     _ring2Controller = AnimationController(
       duration: const Duration(seconds: 6),
       vsync: this,
-    )..repeat(reverse: false);
+    )..repeat();
     
+    // Ring 3 - fast spin (4s)
     _ring3Controller = AnimationController(
       duration: const Duration(seconds: 4),
       vsync: this,
     )..repeat();
     
-    // Pulsing orb
+    // Pulsing central orb
     _pulseController = AnimationController(
       duration: const Duration(seconds: 2),
       vsync: this,
     )..repeat(reverse: true);
     
-    // Bouncing squares
-    _bounceController = AnimationController(
+    // Bouncing square 1 (2s)
+    _bounce1Controller = AnimationController(
       duration: const Duration(seconds: 2),
       vsync: this,
     )..repeat(reverse: true);
     
-    // Fade out after 1.5s
+    // Bouncing square 2 (2.5s, delayed 0.5s)
+    _bounce2Controller = AnimationController(
+      duration: const Duration(milliseconds: 2500),
+      vsync: this,
+    );
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (mounted) _bounce2Controller.repeat(reverse: true);
+    });
+    
+    // Fade out after 1.5s, complete at ~2.2s
     _fadeController = AnimationController(
       duration: const Duration(milliseconds: 700),
       vsync: this,
     );
     
     Future.delayed(const Duration(milliseconds: 1500), () {
-      _fadeController.forward().then((_) {
-        widget.onComplete?.call();
-      });
+      if (mounted) {
+        _fadeController.forward().then((_) {
+          widget.onComplete?.call();
+        });
+      }
     });
   }
 
@@ -73,7 +88,8 @@ class _SplashScreenState extends State<SplashScreen>
     _ring2Controller.dispose();
     _ring3Controller.dispose();
     _pulseController.dispose();
-    _bounceController.dispose();
+    _bounce1Controller.dispose();
+    _bounce2Controller.dispose();
     _fadeController.dispose();
     super.dispose();
   }
@@ -81,7 +97,9 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return FadeTransition(
-      opacity: Tween<double>(begin: 1, end: 0).animate(_fadeController),
+      opacity: Tween<double>(begin: 1, end: 0).animate(
+        CurvedAnimation(parent: _fadeController, curve: Curves.easeOut),
+      ),
       child: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -92,26 +110,27 @@ class _SplashScreenState extends State<SplashScreen>
         ),
         child: Center(
           child: SizedBox(
-            width: 256,
+            width: 256, // w-64 = 256px
             height: 256,
             child: Stack(
               alignment: Alignment.center,
               children: [
-                // Central pulsing orb
+                // Central pulsing orb (w-32 h-32 = 128px, blur-xl)
                 AnimatedBuilder(
                   animation: _pulseController,
                   builder: (context, child) {
+                    final scale = 1.0 + (_pulseController.value * 0.1);
                     return Container(
-                      width: 128 + (_pulseController.value * 20),
-                      height: 128 + (_pulseController.value * 20),
+                      width: 128 * scale,
+                      height: 128 * scale,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: Colors.white.withOpacity(0.2),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.white.withOpacity(0.3),
-                            blurRadius: 40,
-                            spreadRadius: 10,
+                            color: Colors.white.withOpacity(0.2),
+                            blurRadius: 48, // blur-xl
+                            spreadRadius: 0,
                           ),
                         ],
                       ),
@@ -119,61 +138,189 @@ class _SplashScreenState extends State<SplashScreen>
                   },
                 ),
                 
-                // Ring 1 - slow (8s)
-                _buildRing(_ring1Controller, 128, [
-                  _Orb(angle: 0, size: 32, opacity: 0.3),
-                  _Orb(angle: math.pi, size: 24, opacity: 0.2),
-                ]),
-                
-                // Ring 2 - medium reverse (6s)
-                _buildRing(_ring2Controller, 96, [
-                  _Orb(angle: math.pi / 4, size: 20, opacity: 0.4),
-                  _Orb(angle: math.pi + math.pi / 4, size: 16, opacity: 0.25),
-                ], reverse: true),
-                
-                // Ring 3 - fast (4s)
-                _buildRing(_ring3Controller, 64, [
-                  _Orb(angle: math.pi / 2, size: 12, opacity: 0.5),
-                  _Orb(angle: -math.pi / 2, size: 16, opacity: 0.35),
-                ]),
-                
-                // Floating bouncing squares
+                // Ring 1 - slow (8s) - full container size
+                // Top: w-8 (32px) white/30, Bottom: w-6 (24px) white/20
                 AnimatedBuilder(
-                  animation: _bounceController,
+                  animation: _ring1Controller,
                   builder: (context, child) {
-                    return Stack(
-                      children: [
-                        Positioned(
-                          top: 64 - (_bounceController.value * 20),
-                          left: 64,
-                          child: Transform.rotate(
-                            angle: math.pi / 4,
-                            child: Container(
-                              width: 24,
-                              height: 24,
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.15),
-                                borderRadius: BorderRadius.circular(4),
+                    return Transform.rotate(
+                      angle: _ring1Controller.value * 2 * math.pi,
+                      child: SizedBox(
+                        width: 256,
+                        height: 256,
+                        child: Stack(
+                          children: [
+                            // Top center
+                            Align(
+                              alignment: Alignment.topCenter,
+                              child: Container(
+                                width: 32,
+                                height: 32,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.white.withOpacity(0.3),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.white.withOpacity(0.15),
+                                      blurRadius: 8,
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        ),
-                        Positioned(
-                          bottom: 64 - (_bounceController.value * 15),
-                          right: 64,
-                          child: Transform.rotate(
-                            angle: math.pi / 12,
-                            child: Container(
-                              width: 20,
-                              height: 20,
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(4),
+                            // Bottom center
+                            Align(
+                              alignment: Alignment.bottomCenter,
+                              child: Container(
+                                width: 24,
+                                height: 24,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.white.withOpacity(0.2),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.white.withOpacity(0.1),
+                                      blurRadius: 8,
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                
+                // Ring 2 - medium reverse (6s) - inset-4 (16px inset = 224px)
+                // Top-right: w-5 (20px) white/40, Bottom-left: w-4 (16px) white/25
+                AnimatedBuilder(
+                  animation: _ring2Controller,
+                  builder: (context, child) {
+                    return Transform.rotate(
+                      angle: -_ring2Controller.value * 2 * math.pi, // reverse
+                      child: SizedBox(
+                        width: 224,
+                        height: 224,
+                        child: Stack(
+                          children: [
+                            // Top right
+                            Align(
+                              alignment: Alignment.topRight,
+                              child: Container(
+                                width: 20,
+                                height: 20,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.white.withOpacity(0.4),
+                                ),
+                              ),
+                            ),
+                            // Bottom left
+                            Align(
+                              alignment: Alignment.bottomLeft,
+                              child: Container(
+                                width: 16,
+                                height: 16,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.white.withOpacity(0.25),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                
+                // Ring 3 - fast (4s) - inset-8 (32px inset = 192px)
+                // Left: w-3 (12px) white/50, Right: w-4 (16px) white/35
+                AnimatedBuilder(
+                  animation: _ring3Controller,
+                  builder: (context, child) {
+                    return Transform.rotate(
+                      angle: _ring3Controller.value * 2 * math.pi,
+                      child: SizedBox(
+                        width: 192,
+                        height: 192,
+                        child: Stack(
+                          children: [
+                            // Center left
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: Container(
+                                width: 12,
+                                height: 12,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.white.withOpacity(0.5),
+                                ),
+                              ),
+                            ),
+                            // Center right
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: Container(
+                                width: 16,
+                                height: 16,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.white.withOpacity(0.35),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                
+                // Floating square 1 - top-1/4 left-1/4, rotate-45, 2s bounce
+                AnimatedBuilder(
+                  animation: _bounce1Controller,
+                  builder: (context, child) {
+                    final bounce = Curves.easeInOut.transform(_bounce1Controller.value);
+                    return Positioned(
+                      top: 64 - (bounce * 16), // top-1/4 = 64px with bounce
+                      left: 64, // left-1/4 = 64px
+                      child: Transform.rotate(
+                        angle: math.pi / 4, // rotate-45
+                        child: Container(
+                          width: 24, // w-6 = 24px
+                          height: 24,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(6),
                           ),
                         ),
-                      ],
+                      ),
+                    );
+                  },
+                ),
+                
+                // Floating square 2 - bottom-1/4 right-1/4, rotate-12, 2.5s bounce delayed 0.5s
+                AnimatedBuilder(
+                  animation: _bounce2Controller,
+                  builder: (context, child) {
+                    final bounce = Curves.easeInOut.transform(_bounce2Controller.value);
+                    return Positioned(
+                      bottom: 64 - (bounce * 16), // bottom-1/4 = 64px with bounce
+                      right: 64, // right-1/4 = 64px
+                      child: Transform.rotate(
+                        angle: math.pi / 15, // rotate-12 ≈ 12 degrees
+                        child: Container(
+                          width: 20, // w-5 = 20px
+                          height: 20,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                        ),
+                      ),
                     );
                   },
                 ),
@@ -184,41 +331,6 @@ class _SplashScreenState extends State<SplashScreen>
       ),
     );
   }
-
-  Widget _buildRing(AnimationController controller, double radius, List<_Orb> orbs, {bool reverse = false}) {
-    return AnimatedBuilder(
-      animation: controller,
-      builder: (context, child) {
-        final angle = controller.value * 2 * math.pi * (reverse ? -1 : 1);
-        return Stack(
-          alignment: Alignment.center,
-          children: orbs.map((orb) {
-            final x = math.cos(angle + orb.angle) * radius;
-            final y = math.sin(angle + orb.angle) * radius;
-            return Transform.translate(
-              offset: Offset(x, y),
-              child: Container(
-                width: orb.size,
-                height: orb.size,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white.withOpacity(orb.opacity),
-                ),
-              ),
-            );
-          }).toList(),
-        );
-      },
-    );
-  }
-}
-
-class _Orb {
-  final double angle;
-  final double size;
-  final double opacity;
-  
-  _Orb({required this.angle, required this.size, required this.opacity});
 }
 
 

@@ -20,8 +20,6 @@ class _SplashScreenState extends State<SplashScreen>
   late AnimationController _ring2Controller;
   late AnimationController _ring3Controller;
   late AnimationController _pulseController;
-  late AnimationController _bounce1Controller;
-  late AnimationController _bounce2Controller;
   late AnimationController _fadeController;
 
   @override
@@ -52,22 +50,7 @@ class _SplashScreenState extends State<SplashScreen>
       vsync: this,
     )..repeat(reverse: true);
     
-    // Bouncing square 1 (2s)
-    _bounce1Controller = AnimationController(
-      duration: const Duration(seconds: 2),
-      vsync: this,
-    )..repeat(reverse: true);
-    
-    // Bouncing square 2 (2.5s, delayed 0.5s)
-    _bounce2Controller = AnimationController(
-      duration: const Duration(milliseconds: 2500),
-      vsync: this,
-    );
-    Future.delayed(const Duration(milliseconds: 500), () {
-      if (mounted) _bounce2Controller.repeat(reverse: true);
-    });
-    
-    // Fade out after 1.5s, complete at ~2.2s
+    // Smooth fade out after 1.5s using easeInOut curve (700ms duration)
     _fadeController = AnimationController(
       duration: const Duration(milliseconds: 700),
       vsync: this,
@@ -88,8 +71,6 @@ class _SplashScreenState extends State<SplashScreen>
     _ring2Controller.dispose();
     _ring3Controller.dispose();
     _pulseController.dispose();
-    _bounce1Controller.dispose();
-    _bounce2Controller.dispose();
     _fadeController.dispose();
     super.dispose();
   }
@@ -98,7 +79,10 @@ class _SplashScreenState extends State<SplashScreen>
   Widget build(BuildContext context) {
     return FadeTransition(
       opacity: Tween<double>(begin: 1, end: 0).animate(
-        CurvedAnimation(parent: _fadeController, curve: Curves.easeOut),
+        CurvedAnimation(
+          parent: _fadeController,
+          curve: Curves.easeInOut, // Smooth gradual transition
+        ),
       ),
       child: Container(
         decoration: const BoxDecoration(
@@ -119,7 +103,8 @@ class _SplashScreenState extends State<SplashScreen>
                 AnimatedBuilder(
                   animation: _pulseController,
                   builder: (context, child) {
-                    final scale = 1.0 + (_pulseController.value * 0.1);
+                    final pulse = Curves.easeInOut.transform(_pulseController.value);
+                    final scale = 1.0 + (pulse * 0.1);
                     return Container(
                       width: 128 * scale,
                       height: 128 * scale,
@@ -150,7 +135,7 @@ class _SplashScreenState extends State<SplashScreen>
                         height: 256,
                         child: Stack(
                           children: [
-                            // Top center
+                            // Top center - circle with blur
                             Align(
                               alignment: Alignment.topCenter,
                               child: Container(
@@ -168,7 +153,7 @@ class _SplashScreenState extends State<SplashScreen>
                                 ),
                               ),
                             ),
-                            // Bottom center
+                            // Bottom center - circle with blur
                             Align(
                               alignment: Alignment.bottomCenter,
                               child: Container(
@@ -205,7 +190,7 @@ class _SplashScreenState extends State<SplashScreen>
                         height: 224,
                         child: Stack(
                           children: [
-                            // Top right
+                            // Top right - circle
                             Align(
                               alignment: Alignment.topRight,
                               child: Container(
@@ -217,7 +202,7 @@ class _SplashScreenState extends State<SplashScreen>
                                 ),
                               ),
                             ),
-                            // Bottom left
+                            // Bottom left - circle
                             Align(
                               alignment: Alignment.bottomLeft,
                               child: Container(
@@ -248,7 +233,7 @@ class _SplashScreenState extends State<SplashScreen>
                         height: 192,
                         child: Stack(
                           children: [
-                            // Center left
+                            // Center left - circle
                             Align(
                               alignment: Alignment.centerLeft,
                               child: Container(
@@ -260,7 +245,7 @@ class _SplashScreenState extends State<SplashScreen>
                                 ),
                               ),
                             ),
-                            // Center right
+                            // Center right - circle
                             Align(
                               alignment: Alignment.centerRight,
                               child: Container(
@@ -279,46 +264,55 @@ class _SplashScreenState extends State<SplashScreen>
                   },
                 ),
                 
-                // Floating square 1 - top-1/4 left-1/4, rotate-45, 2s bounce
+                // Additional floating circles (replacing squares)
+                // Top-left area floating circle
                 AnimatedBuilder(
-                  animation: _bounce1Controller,
+                  animation: _pulseController,
                   builder: (context, child) {
-                    final bounce = Curves.easeInOut.transform(_bounce1Controller.value);
+                    final pulse = Curves.easeInOut.transform(_pulseController.value);
                     return Positioned(
-                      top: 64 - (bounce * 16), // top-1/4 = 64px with bounce
-                      left: 64, // left-1/4 = 64px
-                      child: Transform.rotate(
-                        angle: math.pi / 4, // rotate-45
-                        child: Container(
-                          width: 24, // w-6 = 24px
-                          height: 24,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.15),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
+                      top: 48 - (pulse * 12),
+                      left: 48,
+                      child: Container(
+                        width: 24,
+                        height: 24,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white.withOpacity(0.15),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.white.withOpacity(0.1),
+                              blurRadius: 12,
+                            ),
+                          ],
                         ),
                       ),
                     );
                   },
                 ),
                 
-                // Floating square 2 - bottom-1/4 right-1/4, rotate-12, 2.5s bounce delayed 0.5s
+                // Bottom-right area floating circle
                 AnimatedBuilder(
-                  animation: _bounce2Controller,
+                  animation: _pulseController,
                   builder: (context, child) {
-                    final bounce = Curves.easeInOut.transform(_bounce2Controller.value);
+                    final pulse = Curves.easeInOut.transform(
+                      (_pulseController.value + 0.5) % 1.0, // offset phase
+                    );
                     return Positioned(
-                      bottom: 64 - (bounce * 16), // bottom-1/4 = 64px with bounce
-                      right: 64, // right-1/4 = 64px
-                      child: Transform.rotate(
-                        angle: math.pi / 15, // rotate-12 ≈ 12 degrees
-                        child: Container(
-                          width: 20, // w-5 = 20px
-                          height: 20,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
+                      bottom: 48 - (pulse * 12),
+                      right: 48,
+                      child: Container(
+                        width: 20,
+                        height: 20,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white.withOpacity(0.2),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.white.withOpacity(0.1),
+                              blurRadius: 10,
+                            ),
+                          ],
                         ),
                       ),
                     );

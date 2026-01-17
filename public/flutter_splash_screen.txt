@@ -1,5 +1,5 @@
 // Flutter Splash Screen Animation
-// Matches the Kalam web splash exactly
+// EXACT match of the Kalam web splash from Index.tsx
 // Copy this entire file into your Flutter project
 
 import 'package:flutter/material.dart';
@@ -20,19 +20,21 @@ class _SplashScreenState extends State<SplashScreen>
   late AnimationController _ring2Controller;
   late AnimationController _ring3Controller;
   late AnimationController _pulseController;
+  late AnimationController _bounce1Controller;
+  late AnimationController _bounce2Controller;
   late AnimationController _fadeController;
 
   @override
   void initState() {
     super.initState();
     
-    // Ring 1 - slow spin (8s)
+    // Ring 1 - slow spin (8s) - matches: style={{ animationDuration: '8s' }}
     _ring1Controller = AnimationController(
       duration: const Duration(seconds: 8),
       vsync: this,
     )..repeat();
     
-    // Ring 2 - medium reverse spin (6s)
+    // Ring 2 - medium reverse spin (6s) - matches: animationDirection: 'reverse'
     _ring2Controller = AnimationController(
       duration: const Duration(seconds: 6),
       vsync: this,
@@ -44,15 +46,35 @@ class _SplashScreenState extends State<SplashScreen>
       vsync: this,
     )..repeat();
     
-    // Pulsing central orb
+    // Pulsing central orb - matches: animate-pulse
     _pulseController = AnimationController(
       duration: const Duration(seconds: 2),
       vsync: this,
     )..repeat(reverse: true);
     
-    // Smooth fade out after 1.5s using easeInOut curve (700ms duration)
+    // Bounce animation 1 - matches: animationDuration: '2s'
+    _bounce1Controller = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    )..repeat(reverse: true);
+    
+    // Bounce animation 2 - matches: animationDuration: '2.5s', animationDelay: '0.5s'
+    _bounce2Controller = AnimationController(
+      duration: const Duration(milliseconds: 2500),
+      vsync: this,
+    );
+    
+    // Start bounce2 with 0.5s delay
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (mounted) {
+        _bounce2Controller.repeat(reverse: true);
+      }
+    });
+    
+    // Fade out - matches: transition-opacity duration-700 (700ms)
+    // Starts at 1500ms (fadeTimer), completes at 2300ms (hideTimer)
     _fadeController = AnimationController(
-      duration: const Duration(milliseconds: 700),
+      duration: const Duration(milliseconds: 800), // 2300 - 1500 = 800ms
       vsync: this,
     );
     
@@ -71,6 +93,8 @@ class _SplashScreenState extends State<SplashScreen>
     _ring2Controller.dispose();
     _ring3Controller.dispose();
     _pulseController.dispose();
+    _bounce1Controller.dispose();
+    _bounce2Controller.dispose();
     _fadeController.dispose();
     super.dispose();
   }
@@ -81,10 +105,11 @@ class _SplashScreenState extends State<SplashScreen>
       opacity: Tween<double>(begin: 1, end: 0).animate(
         CurvedAnimation(
           parent: _fadeController,
-          curve: Curves.easeInOut, // Smooth gradual transition
+          curve: Curves.easeOut, // matches: transition-opacity duration-700
         ),
       ),
       child: Container(
+        // matches: gradient-primary from index.css
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
@@ -94,27 +119,28 @@ class _SplashScreenState extends State<SplashScreen>
         ),
         child: Center(
           child: SizedBox(
-            width: 256, // w-64 = 256px
-            height: 256,
+            width: 256, // matches: w-64 = 16rem = 256px
+            height: 256, // matches: h-64
             child: Stack(
               alignment: Alignment.center,
               children: [
-                // Central pulsing orb (w-32 h-32 = 128px, blur-xl)
+                // Central pulsing orb
+                // matches: w-32 h-32 bg-white/20 rounded-full blur-xl animate-pulse
                 AnimatedBuilder(
                   animation: _pulseController,
                   builder: (context, child) {
                     final pulse = Curves.easeInOut.transform(_pulseController.value);
-                    final scale = 1.0 + (pulse * 0.1);
+                    final opacity = 0.15 + (pulse * 0.1); // pulse between 0.15 and 0.25
                     return Container(
-                      width: 128 * scale,
-                      height: 128 * scale,
+                      width: 128, // w-32 = 8rem = 128px
+                      height: 128, // h-32
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withOpacity(opacity),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.white.withOpacity(0.2),
-                            blurRadius: 48, // blur-xl
+                            blurRadius: 48, // blur-xl ≈ 24px * 2
                             spreadRadius: 0,
                           ),
                         ],
@@ -123,49 +149,49 @@ class _SplashScreenState extends State<SplashScreen>
                   },
                 ),
                 
-                // Ring 1 - slow (8s) - full container size
-                // Top: w-8 (32px) white/30, Bottom: w-6 (24px) white/20
+                // Ring 1 - slow (8s)
+                // matches: absolute inset-0 animate-spin style={{ animationDuration: '8s' }}
                 AnimatedBuilder(
                   animation: _ring1Controller,
                   builder: (context, child) {
                     return Transform.rotate(
                       angle: _ring1Controller.value * 2 * math.pi,
                       child: SizedBox(
-                        width: 256,
+                        width: 256, // inset-0 = full container
                         height: 256,
                         child: Stack(
                           children: [
-                            // Top center - circle with blur
+                            // matches: absolute top-0 left-1/2 -translate-x-1/2 w-8 h-8 bg-white/30 rounded-full blur-sm
                             Align(
                               alignment: Alignment.topCenter,
                               child: Container(
-                                width: 32,
-                                height: 32,
+                                width: 32, // w-8 = 2rem = 32px
+                                height: 32, // h-8
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: Colors.white.withOpacity(0.3),
+                                  color: Colors.white.withOpacity(0.3), // bg-white/30
                                   boxShadow: [
                                     BoxShadow(
                                       color: Colors.white.withOpacity(0.15),
-                                      blurRadius: 8,
+                                      blurRadius: 8, // blur-sm ≈ 4px * 2
                                     ),
                                   ],
                                 ),
                               ),
                             ),
-                            // Bottom center - circle with blur
+                            // matches: absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-6 bg-white/20 rounded-full blur-sm
                             Align(
                               alignment: Alignment.bottomCenter,
                               child: Container(
-                                width: 24,
-                                height: 24,
+                                width: 24, // w-6 = 1.5rem = 24px
+                                height: 24, // h-6
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: Colors.white.withOpacity(0.2),
+                                  color: Colors.white.withOpacity(0.2), // bg-white/20
                                   boxShadow: [
                                     BoxShadow(
                                       color: Colors.white.withOpacity(0.1),
-                                      blurRadius: 8,
+                                      blurRadius: 8, // blur-sm
                                     ),
                                   ],
                                 ),
@@ -178,39 +204,39 @@ class _SplashScreenState extends State<SplashScreen>
                   },
                 ),
                 
-                // Ring 2 - medium reverse (6s) - inset-4 (16px inset = 224px)
-                // Top-right: w-5 (20px) white/40, Bottom-left: w-4 (16px) white/25
+                // Ring 2 - medium reverse (6s)
+                // matches: absolute inset-4 animate-spin style={{ animationDuration: '6s', animationDirection: 'reverse' }}
                 AnimatedBuilder(
                   animation: _ring2Controller,
                   builder: (context, child) {
                     return Transform.rotate(
-                      angle: -_ring2Controller.value * 2 * math.pi, // reverse
+                      angle: -_ring2Controller.value * 2 * math.pi, // reverse direction
                       child: SizedBox(
-                        width: 224,
+                        width: 224, // inset-4 = 256 - (16*2) = 224px
                         height: 224,
                         child: Stack(
                           children: [
-                            // Top right - circle
+                            // matches: absolute top-0 right-0 w-5 h-5 bg-white/40 rounded-full
                             Align(
                               alignment: Alignment.topRight,
                               child: Container(
-                                width: 20,
-                                height: 20,
+                                width: 20, // w-5 = 1.25rem = 20px
+                                height: 20, // h-5
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: Colors.white.withOpacity(0.4),
+                                  color: Colors.white.withOpacity(0.4), // bg-white/40
                                 ),
                               ),
                             ),
-                            // Bottom left - circle
+                            // matches: absolute bottom-0 left-0 w-4 h-4 bg-white/25 rounded-full
                             Align(
                               alignment: Alignment.bottomLeft,
                               child: Container(
-                                width: 16,
-                                height: 16,
+                                width: 16, // w-4 = 1rem = 16px
+                                height: 16, // h-4
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: Colors.white.withOpacity(0.25),
+                                  color: Colors.white.withOpacity(0.25), // bg-white/25
                                 ),
                               ),
                             ),
@@ -221,39 +247,39 @@ class _SplashScreenState extends State<SplashScreen>
                   },
                 ),
                 
-                // Ring 3 - fast (4s) - inset-8 (32px inset = 192px)
-                // Left: w-3 (12px) white/50, Right: w-4 (16px) white/35
+                // Ring 3 - fast (4s)
+                // matches: absolute inset-8 animate-spin style={{ animationDuration: '4s' }}
                 AnimatedBuilder(
                   animation: _ring3Controller,
                   builder: (context, child) {
                     return Transform.rotate(
                       angle: _ring3Controller.value * 2 * math.pi,
                       child: SizedBox(
-                        width: 192,
+                        width: 192, // inset-8 = 256 - (32*2) = 192px
                         height: 192,
                         child: Stack(
                           children: [
-                            // Center left - circle
+                            // matches: absolute top-1/2 left-0 -translate-y-1/2 w-3 h-3 bg-white/50 rounded-full
                             Align(
                               alignment: Alignment.centerLeft,
                               child: Container(
-                                width: 12,
-                                height: 12,
+                                width: 12, // w-3 = 0.75rem = 12px
+                                height: 12, // h-3
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: Colors.white.withOpacity(0.5),
+                                  color: Colors.white.withOpacity(0.5), // bg-white/50
                                 ),
                               ),
                             ),
-                            // Center right - circle
+                            // matches: absolute top-1/2 right-0 -translate-y-1/2 w-4 h-4 bg-white/35 rounded-full
                             Align(
                               alignment: Alignment.centerRight,
                               child: Container(
-                                width: 16,
-                                height: 16,
+                                width: 16, // w-4 = 1rem = 16px
+                                height: 16, // h-4
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: Colors.white.withOpacity(0.35),
+                                  color: Colors.white.withOpacity(0.35), // bg-white/35
                                 ),
                               ),
                             ),
@@ -264,55 +290,52 @@ class _SplashScreenState extends State<SplashScreen>
                   },
                 ),
                 
-                // Additional floating circles (replacing squares)
-                // Top-left area floating circle
+                // Floating shape 1 (SQUARE with rotate-45)
+                // matches: absolute top-1/4 left-1/4 w-6 h-6 bg-white/15 rounded-lg rotate-45 animate-bounce
+                // style={{ animationDuration: '2s' }}
                 AnimatedBuilder(
-                  animation: _pulseController,
+                  animation: _bounce1Controller,
                   builder: (context, child) {
-                    final pulse = Curves.easeInOut.transform(_pulseController.value);
+                    final bounce = Curves.easeInOut.transform(_bounce1Controller.value);
+                    final offsetY = bounce * 16; // bounce movement
                     return Positioned(
-                      top: 48 - (pulse * 12),
-                      left: 48,
-                      child: Container(
-                        width: 24,
-                        height: 24,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white.withOpacity(0.15),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.white.withOpacity(0.1),
-                              blurRadius: 12,
-                            ),
-                          ],
+                      top: 64 - offsetY, // top-1/4 of 256 = 64px
+                      left: 64, // left-1/4 of 256 = 64px
+                      child: Transform.rotate(
+                        angle: 45 * math.pi / 180, // rotate-45
+                        child: Container(
+                          width: 24, // w-6 = 1.5rem = 24px
+                          height: 24, // h-6
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(6), // rounded-lg
+                            color: Colors.white.withOpacity(0.15), // bg-white/15
+                          ),
                         ),
                       ),
                     );
                   },
                 ),
                 
-                // Bottom-right area floating circle
+                // Floating shape 2 (SQUARE with rotate-12)
+                // matches: absolute bottom-1/4 right-1/4 w-5 h-5 bg-white/20 rounded-lg rotate-12 animate-bounce
+                // style={{ animationDuration: '2.5s', animationDelay: '0.5s' }}
                 AnimatedBuilder(
-                  animation: _pulseController,
+                  animation: _bounce2Controller,
                   builder: (context, child) {
-                    final pulse = Curves.easeInOut.transform(
-                      (_pulseController.value + 0.5) % 1.0, // offset phase
-                    );
+                    final bounce = Curves.easeInOut.transform(_bounce2Controller.value);
+                    final offsetY = bounce * 16; // bounce movement
                     return Positioned(
-                      bottom: 48 - (pulse * 12),
-                      right: 48,
-                      child: Container(
-                        width: 20,
-                        height: 20,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white.withOpacity(0.2),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.white.withOpacity(0.1),
-                              blurRadius: 10,
-                            ),
-                          ],
+                      bottom: 64 - offsetY, // bottom-1/4 of 256 = 64px
+                      right: 64, // right-1/4 of 256 = 64px
+                      child: Transform.rotate(
+                        angle: 12 * math.pi / 180, // rotate-12
+                        child: Container(
+                          width: 20, // w-5 = 1.25rem = 20px
+                          height: 20, // h-5
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(6), // rounded-lg
+                            color: Colors.white.withOpacity(0.2), // bg-white/20
+                          ),
                         ),
                       ),
                     );
@@ -340,17 +363,69 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: SplashScreen(
-        onComplete: () {
-          // Navigate to your home screen after splash
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) => HomeScreen()),
-          );
-        },
-      ),
+      debugShowCheckedModeBanner: false,
+      home: SplashWrapper(),
     );
   }
 }
 
-// Or use it as an overlay in your existing app structure
+class SplashWrapper extends StatefulWidget {
+  const SplashWrapper({super.key});
+
+  @override
+  State<SplashWrapper> createState() => _SplashWrapperState();
+}
+
+class _SplashWrapperState extends State<SplashWrapper> {
+  bool _showSplash = true;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        // Your main app content
+        const HomeScreen(),
+        
+        // Splash overlay
+        if (_showSplash)
+          SplashScreen(
+            onComplete: () {
+              setState(() {
+                _showSplash = false;
+              });
+            },
+          ),
+      ],
+    );
+  }
+}
+
+// Placeholder home screen
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
+          ),
+        ),
+        child: const Center(
+          child: Text(
+            'Kalam',
+            style: TextStyle(
+              fontSize: 48,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

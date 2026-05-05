@@ -122,7 +122,7 @@ const Paywall = () => {
             size="lg"
             className="w-full bg-primary-foreground text-primary hover:bg-primary-foreground shadow-xl shadow-black/15 hover:shadow-2xl hover:shadow-black/25 hover:-translate-y-0.5 transition-all duration-200 font-semibold animate-pulse-cta"
           >
-            Start 7-Day Free Trial
+            Start 14-Day Free Trial
           </Button>
           <button
             onClick={() => navigate("/")}

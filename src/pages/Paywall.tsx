@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Check, Sparkles, MessageCircle, Languages, PlayCircle, TrendingUp, Users } from "lucide-react";
+import { MessageCircle, Languages, PlayCircle, TrendingUp } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -16,75 +16,69 @@ const Paywall = () => {
 
   return (
     <main className="min-h-screen gradient-primary relative overflow-hidden">
-      {/* Floating background orbs */}
+      {/* Soft ambient glow */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-20 -left-20 w-72 h-72 bg-white/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute top-1/3 -right-24 w-80 h-80 bg-white/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-1/4 w-64 h-64 bg-white/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
+        <div className="absolute -top-40 -left-20 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
+        <div className="absolute -bottom-40 -right-20 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
       </div>
 
-      <div className="relative z-10 mx-auto max-w-md px-6 pt-10 pb-8 flex flex-col min-h-screen">
-        {/* Welcome badge */}
-        <div className="flex justify-center animate-fade-in">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/15 backdrop-blur-md border border-white/25">
-            <Sparkles className="w-3.5 h-3.5 text-accent-yellow" />
-            <span className="text-xs font-semibold text-primary-foreground tracking-wide">Welcome to Kalam</span>
-          </div>
-        </div>
+      <div className="relative z-10 mx-auto max-w-md px-6 pt-12 pb-10 flex flex-col min-h-screen">
+        {/* Top label */}
+        <p className="text-center text-xs font-medium tracking-[0.2em] uppercase text-primary-foreground/60 animate-fade-in">
+          Welcome to Kalam
+        </p>
 
         {/* Header */}
-        <header className="text-center mt-5 animate-fade-in">
-          <h1 className="font-heading text-[2rem] font-bold text-primary-foreground tracking-tight leading-[1.15]">
+        <header className="text-center mt-4 animate-fade-in">
+          <h1 className="font-heading text-[1.875rem] font-semibold text-primary-foreground tracking-tight leading-[1.15]">
             Start Speaking Arabic with Confidence
           </h1>
-          <p className="text-primary-foreground/80 mt-3 text-sm leading-relaxed">
+          <p className="text-primary-foreground/70 mt-3 text-[15px] leading-relaxed">
             You're all set. Let's help you start speaking and understanding Arabic with confidence.
           </p>
         </header>
 
-        {/* Features card */}
-        <section className="mt-6 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 p-5 space-y-3.5 animate-scale-in">
+        {/* Features */}
+        <section className="mt-10 space-y-5">
           {features.map(({ icon: Icon, text }) => (
-            <div key={text} className="flex items-start gap-3">
-              <div className="shrink-0 w-9 h-9 rounded-xl bg-accent-yellow/20 border border-accent-yellow/30 flex items-center justify-center">
-                <Icon className="w-4 h-4 text-accent-yellow" />
-              </div>
-              <p className="text-sm text-primary-foreground/95 pt-2 leading-snug font-medium">{text}</p>
+            <div key={text} className="flex items-center gap-4">
+              <Icon className="w-[18px] h-[18px] text-primary-foreground/85 shrink-0" strokeWidth={1.75} />
+              <p className="text-[14px] text-primary-foreground/90 leading-snug">{text}</p>
             </div>
           ))}
         </section>
 
         {/* Pricing */}
-        <section className="mt-6 space-y-3">
+        <section className="mt-10 space-y-3">
           <button
             type="button"
             onClick={() => setPlan("yearly")}
-            className={`relative w-full text-left rounded-2xl p-4 pr-5 transition-all duration-300 border-2 ${
+            className={`relative w-full text-left rounded-2xl px-5 py-4 transition-all duration-300 ${
               plan === "yearly"
-                ? "bg-white border-accent-yellow shadow-2xl shadow-black/25 scale-[1.02]"
-                : "bg-white/10 border-white/25 backdrop-blur-md"
+                ? "bg-white shadow-[0_10px_40px_-10px_rgba(0,0,0,0.35)]"
+                : "bg-white/8 backdrop-blur-sm hover:bg-white/12"
             }`}
           >
-            <div className="absolute -top-2.5 right-4 px-3 py-1 rounded-full bg-accent-yellow text-[10px] font-extrabold text-foreground tracking-wider shadow-lg shadow-black/20">
-              SAVE 50%
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex-1">
-                <p className={`text-sm font-bold ${plan === "yearly" ? "text-primary" : "text-primary-foreground"}`}>
+            {plan === "yearly" && (
+              <div className="absolute -top-2 right-4 px-2.5 py-0.5 rounded-full bg-[hsl(var(--accent-yellow))] text-[10px] font-semibold text-foreground tracking-wide">
+                Save 50%
+              </div>
+            )}
+            <div className="flex items-baseline justify-between">
+              <div>
+                <p className={`text-[13px] font-medium ${plan === "yearly" ? "text-foreground/60" : "text-primary-foreground/70"}`}>
                   Yearly · Best Value
                 </p>
                 <div className="flex items-baseline gap-1.5 mt-1">
-                  <span className={`text-xl font-extrabold ${plan === "yearly" ? "text-foreground" : "text-primary-foreground"}`}>$48</span>
-                  <span className={`text-xs ${plan === "yearly" ? "text-muted-foreground" : "text-primary-foreground/70"}`}>/year · $4/mo</span>
+                  <span className={`text-2xl font-semibold ${plan === "yearly" ? "text-foreground" : "text-primary-foreground"}`}>$48</span>
+                  <span className={`text-xs ${plan === "yearly" ? "text-foreground/50" : "text-primary-foreground/55"}`}>per year</span>
                 </div>
-                <p className={`text-[11px] mt-0.5 line-through ${plan === "yearly" ? "text-muted-foreground/70" : "text-primary-foreground/50"}`}>
-                  Instead of $7.99/month
-                </p>
               </div>
-              <div className={`shrink-0 w-5 h-5 rounded-full flex items-center justify-center ${
-                plan === "yearly" ? "bg-primary" : "border-2 border-white/40"
-              }`}>
-                {plan === "yearly" && <Check className="w-3 h-3 text-primary-foreground" />}
+              <div className="text-right">
+                <p className={`text-xs ${plan === "yearly" ? "text-foreground/55" : "text-primary-foreground/60"}`}>$4/month</p>
+                <p className={`text-[11px] mt-0.5 ${plan === "yearly" ? "text-foreground/35 line-through" : "text-primary-foreground/40 line-through"}`}>
+                  $7.99/mo
+                </p>
               </div>
             </div>
           </button>
@@ -92,58 +86,46 @@ const Paywall = () => {
           <button
             type="button"
             onClick={() => setPlan("monthly")}
-            className={`w-full text-left rounded-2xl p-4 transition-all duration-300 border-2 ${
+            className={`w-full text-left rounded-2xl px-5 py-4 transition-all duration-300 ${
               plan === "monthly"
-                ? "bg-white border-accent-yellow shadow-2xl shadow-black/25 scale-[1.02]"
-                : "bg-white/5 border-white/15 backdrop-blur-md"
+                ? "bg-white shadow-[0_10px_40px_-10px_rgba(0,0,0,0.35)]"
+                : "bg-white/8 backdrop-blur-sm hover:bg-white/12"
             }`}
           >
-            <div className="flex items-center justify-between">
+            <div className="flex items-baseline justify-between">
               <div>
-                <p className={`text-sm font-bold ${plan === "monthly" ? "text-primary" : "text-primary-foreground/90"}`}>
+                <p className={`text-[13px] font-medium ${plan === "monthly" ? "text-foreground/60" : "text-primary-foreground/70"}`}>
                   Monthly
                 </p>
                 <div className="flex items-baseline gap-1.5 mt-1">
-                  <span className={`text-lg font-extrabold ${plan === "monthly" ? "text-foreground" : "text-primary-foreground/90"}`}>$7.99</span>
-                  <span className={`text-xs ${plan === "monthly" ? "text-muted-foreground" : "text-primary-foreground/60"}`}>/month</span>
+                  <span className={`text-2xl font-semibold ${plan === "monthly" ? "text-foreground" : "text-primary-foreground"}`}>$7.99</span>
+                  <span className={`text-xs ${plan === "monthly" ? "text-foreground/50" : "text-primary-foreground/55"}`}>per month</span>
                 </div>
-              </div>
-              <div className={`w-5 h-5 rounded-full flex items-center justify-center ${
-                plan === "monthly" ? "bg-primary" : "border-2 border-white/40"
-              }`}>
-                {plan === "monthly" && <Check className="w-3 h-3 text-primary-foreground" />}
               </div>
             </div>
           </button>
-
-          <p className="text-center text-xs font-medium text-accent-yellow pt-1">
-            ⚡ Lock in this 50% discount today
-          </p>
         </section>
 
         {/* CTA */}
-        <footer className="mt-auto pt-6 space-y-3">
+        <footer className="mt-auto pt-10 space-y-3">
+          <p className="text-center text-[12px] text-primary-foreground/55">
+            Lock in this 50% discount today
+          </p>
           <Button
             size="lg"
-            className="w-full bg-accent-yellow text-foreground hover:bg-accent-yellow hover:brightness-105 shadow-xl shadow-black/25 hover:shadow-2xl hover:-translate-y-0.5 transition-all duration-200 font-bold text-base h-14 rounded-2xl animate-pulse-cta"
+            className="w-full bg-[hsl(var(--accent-yellow))] text-foreground hover:bg-[hsl(var(--accent-yellow))] hover:brightness-[1.03] shadow-[0_10px_30px_-10px_rgba(0,0,0,0.4)] hover:-translate-y-0.5 transition-all duration-300 font-semibold text-[15px] h-14 rounded-2xl animate-pulse-cta"
           >
-            Start 7-Day Free Trial
+            Start Free Trial
           </Button>
-          <p className="text-center text-xs text-primary-foreground/75">
+          <p className="text-center text-[12px] text-primary-foreground/55">
             Cancel anytime · No commitment
           </p>
           <button
             onClick={() => navigate("/")}
-            className="w-full text-center text-sm text-primary-foreground/60 hover:text-primary-foreground/90 underline-offset-4 hover:underline transition-colors py-1"
+            className="w-full text-center text-[13px] text-primary-foreground/50 hover:text-primary-foreground/75 transition-colors pt-3"
           >
             Continue with limited access
           </button>
-          <div className="flex items-center justify-center gap-1.5 pt-1">
-            <Users className="w-3 h-3 text-primary-foreground/60" />
-            <p className="text-center text-[11px] text-primary-foreground/60">
-              Join thousands learning Arabic with Kalam
-            </p>
-          </div>
         </footer>
       </div>
     </main>

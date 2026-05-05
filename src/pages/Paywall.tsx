@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { MessageCircle, Languages, PlayCircle, TrendingUp } from "lucide-react";
+import { MessageCircle, Languages, PlayCircle, TrendingUp, Star } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -22,7 +22,7 @@ const Paywall = () => {
         <div className="absolute -bottom-40 -right-20 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
       </div>
 
-      <div className="relative z-10 mx-auto w-full max-w-md min-h-screen px-6 pt-8 pb-6 flex flex-col">
+      <div className="relative z-10 mx-auto w-full max-w-md min-h-screen px-6 pt-7 pb-6 flex flex-col">
         {/* Top label */}
         <p className="text-center text-[10px] font-semibold tracking-[0.22em] uppercase text-primary-foreground/55 animate-fade-in">
           Welcome to Kalam
@@ -36,10 +36,23 @@ const Paywall = () => {
           <p className="text-primary-foreground/70 mt-2.5 text-[13px] leading-relaxed px-2">
             You're all set. Let's help you start speaking with confidence.
           </p>
+
+          {/* Social proof */}
+          <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-sm">
+            <div className="flex -space-x-2">
+              <div className="w-5 h-5 rounded-full bg-gradient-to-br from-pink-300 to-purple-400 ring-2 ring-[hsl(262,83%,58%)]" />
+              <div className="w-5 h-5 rounded-full bg-gradient-to-br from-amber-200 to-orange-400 ring-2 ring-[hsl(262,83%,58%)]" />
+              <div className="w-5 h-5 rounded-full bg-gradient-to-br from-teal-200 to-emerald-400 ring-2 ring-[hsl(262,83%,58%)]" />
+            </div>
+            <div className="flex items-center gap-1">
+              <Star className="w-3 h-3 fill-[hsl(var(--accent-yellow))] text-[hsl(var(--accent-yellow))]" />
+              <span className="text-[11px] font-medium text-primary-foreground/90">Loved by 10,000+ learners</span>
+            </div>
+          </div>
         </header>
 
         {/* Features */}
-        <section className="mt-6 space-y-3.5">
+        <section className="mt-7 space-y-4">
           {features.map(({ icon: Icon, text }) => (
             <div key={text} className="flex items-center gap-3.5">
               <Icon className="w-[18px] h-[18px] text-primary-foreground/80 shrink-0" strokeWidth={1.75} />
@@ -49,7 +62,7 @@ const Paywall = () => {
         </section>
 
         {/* Pricing */}
-        <section className="mt-6 space-y-2.5">
+        <section className="mt-auto pt-7 space-y-2.5">
           <button
             type="button"
             onClick={() => setPlan("yearly")}
@@ -103,24 +116,24 @@ const Paywall = () => {
         </section>
 
         {/* CTA */}
-        <footer className="mt-6 space-y-2.5">
-          <p className="text-center text-[11px] text-primary-foreground/55">
+        <footer className="mt-4 space-y-2.5">
+          <p className="text-center text-[11px] font-medium text-[hsl(var(--accent-yellow))]/90">
             Lock in this 50% discount today
           </p>
           <Button
             size="lg"
             className="w-full bg-[hsl(var(--accent-yellow))] text-foreground hover:bg-[hsl(var(--accent-yellow))] hover:brightness-[1.03] shadow-[0_10px_30px_-10px_rgba(0,0,0,0.45)] hover:-translate-y-0.5 transition-all duration-300 font-semibold text-[15px] h-13 rounded-2xl animate-pulse-cta"
           >
-            Start Free Trial
+            Start Your Free Trial
           </Button>
           <p className="text-center text-[11px] text-primary-foreground/55">
-            Cancel anytime · No commitment
+            7 days free · Cancel anytime
           </p>
           <button
             onClick={() => navigate("/")}
-            className="w-full text-center text-[12.5px] text-primary-foreground/50 hover:text-primary-foreground/75 transition-colors pt-1"
+            className="w-full text-center text-[12.5px] text-primary-foreground/45 hover:text-primary-foreground/75 transition-colors pt-0.5"
           >
-            Continue with limited access
+            Maybe later
           </button>
         </footer>
       </div>

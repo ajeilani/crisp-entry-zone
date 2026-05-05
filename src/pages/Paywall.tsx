@@ -22,47 +22,43 @@ const Paywall = () => {
         <div className="absolute -bottom-40 -right-20 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
       </div>
 
-      <div className="relative z-10 mx-auto w-full max-w-md min-h-screen px-6 pt-7 pb-6 flex flex-col">
+      <div className="relative z-10 mx-auto w-full max-w-md min-h-screen px-5 pt-6 pb-5 flex flex-col justify-between gap-5">
         {/* Top label */}
-        <p className="text-center text-[10px] font-semibold tracking-[0.22em] uppercase text-primary-foreground/55 animate-fade-in">
-          Welcome to Kalam
-        </p>
-
-        {/* Header */}
-        <header className="text-center mt-3 animate-fade-in">
-          <h1 className="font-heading text-[26px] font-semibold text-primary-foreground tracking-tight leading-[1.15]">
-            Start Speaking Arabic with Confidence
-          </h1>
-          <p className="text-primary-foreground/70 mt-2.5 text-[13px] leading-relaxed px-2">
-            You're all set. Let's help you start speaking with confidence.
+        <div>
+          <p className="text-center text-[10px] font-semibold tracking-[0.22em] uppercase text-primary-foreground/55 animate-fade-in">
+            Welcome to Kalam
           </p>
 
-          {/* Social proof */}
-          <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-sm">
-            <div className="flex -space-x-2">
-              <div className="w-5 h-5 rounded-full bg-gradient-to-br from-pink-300 to-purple-400 ring-2 ring-[hsl(262,83%,58%)]" />
-              <div className="w-5 h-5 rounded-full bg-gradient-to-br from-amber-200 to-orange-400 ring-2 ring-[hsl(262,83%,58%)]" />
-              <div className="w-5 h-5 rounded-full bg-gradient-to-br from-teal-200 to-emerald-400 ring-2 ring-[hsl(262,83%,58%)]" />
-            </div>
-            <div className="flex items-center gap-1">
-              <Star className="w-3 h-3 fill-[hsl(var(--accent-yellow))] text-[hsl(var(--accent-yellow))]" />
-              <span className="text-[11px] font-medium text-primary-foreground/90">Loved by 10,000+ learners</span>
-            </div>
-          </div>
-        </header>
+          {/* Header */}
+          <header className="text-center mt-3 animate-fade-in">
+            <h1 className="font-heading text-[27px] font-semibold text-primary-foreground tracking-tight leading-[1.12]">
+              Start Speaking Arabic with Confidence
+            </h1>
+            <p className="text-primary-foreground/72 mt-2.5 text-[13px] leading-relaxed px-1">
+              Your first step to real conversations, clearer pronunciation, and steady daily progress.
+            </p>
 
-        {/* Features */}
-        <section className="mt-7 space-y-4">
-          {features.map(({ icon: Icon, text }) => (
-            <div key={text} className="flex items-center gap-3.5">
-              <Icon className="w-[18px] h-[18px] text-primary-foreground/80 shrink-0" strokeWidth={1.75} />
-              <p className="text-[13.5px] text-primary-foreground/90 leading-snug">{text}</p>
+            {/* Social proof */}
+            <div className="mt-4 inline-flex items-center gap-2.5 px-3.5 py-2 rounded-full bg-primary-foreground/10 backdrop-blur-sm ring-1 ring-primary-foreground/15">
+              <Star className="w-3.5 h-3.5 fill-[hsl(var(--accent-yellow))] text-[hsl(var(--accent-yellow))]" />
+              <span className="text-[11.5px] font-medium text-primary-foreground/92">Loved by 1,000+ learners</span>
             </div>
-          ))}
-        </section>
+          </header>
 
-        {/* Pricing */}
-        <section className="mt-auto pt-7 space-y-2.5">
+          {/* Features */}
+          <section className="mt-6 space-y-3.5">
+            {features.map(({ icon: Icon, text }) => (
+              <div key={text} className="flex items-center gap-3.5 rounded-2xl bg-primary-foreground/[0.08] px-4 py-3 ring-1 ring-primary-foreground/10">
+                <Icon className="w-[18px] h-[18px] text-primary-foreground/82 shrink-0" strokeWidth={1.75} />
+                <p className="text-[13.5px] text-primary-foreground/90 leading-snug">{text}</p>
+              </div>
+            ))}
+          </section>
+        </div>
+
+        <div className="space-y-4">
+          {/* Pricing */}
+          <section className="space-y-2.5">
           <button
             type="button"
             onClick={() => setPlan("yearly")}
@@ -113,10 +109,10 @@ const Paywall = () => {
               </div>
             </div>
           </button>
-        </section>
+          </section>
 
-        {/* CTA */}
-        <footer className="mt-4 space-y-2.5">
+          {/* CTA */}
+          <footer className="space-y-2.5">
           <p className="text-center text-[11px] font-medium text-[hsl(var(--accent-yellow))]/90">
             Lock in this 50% discount today
           </p>
@@ -135,7 +131,8 @@ const Paywall = () => {
           >
             Maybe later
           </button>
-        </footer>
+          </footer>
+        </div>
       </div>
     </main>
   );
